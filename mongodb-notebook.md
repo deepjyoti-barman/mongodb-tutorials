@@ -62,19 +62,20 @@
 
 - Lists all the existing databases that are currently running on the database server (when started fresh it will show 3 databases which will store some metadata):  
 `> show dbs`
+`> show databases`
 
-    ```log
-    admin     41 kB
-    config  61.4 kB
-    local   73.7 kB
-    ```
+  ```log
+  admin     41 kB
+  config  61.4 kB
+  local   73.7 kB
+  ```
 
 - To display the database you are using (operation may return test, which is the default database):  
 `> db`
 
-    ```log
-    test
-    ```
+  ```log
+  test
+  ```
 
 - We can switch to a database with the 'use' command and we can even switch to non-existing databases. But, in the second case the database won't be created before we start entering data in there. Once we do start entering data, such as by creating a collection, MongoDB will automatically and implicitly create the database so that we don't have to create the database in advance. To switch to a database:  
 `> use shop`
@@ -88,12 +89,12 @@
 `> db.products.insertOne({ name: "A T-shirt", price: 29.99, description: "A new branded T-shirt" })`  
 `> db.products.insertOne({ name: "A Computer", price: 1299.99, description: "A latest high quality gaming computer", details: { cpu: "Intel i7 8770", memory: 32 }} )`
 
-    ```json
-    {
-        acknowledged: true,
-        insertedId: ObjectId("61a2d3573020a42e0968c3e9")
-    }
-    ```
+  ```log
+  {
+      acknowledged: true,
+      insertedId: ObjectId("61a2d3573020a42e0968c3e9")
+  }
+  ```
 
   __Note__:
   - db refers to the database currently connected to, in this case its 'shop'.
@@ -103,28 +104,35 @@
 - List all the data in the collection  
 `> db.products.find()`
 
-    ```json
-    [
-        {
-            _id: ObjectId("61a2d3573020a42e0968c3e9"),
-            name: 'A Book',
-            price: 12.99
-        },
-        {
-            _id: ObjectId("61a2d6173020a42e0968c3ea"),
-            name: 'A T-shirt',
-            price: 29.99,
-            description: 'A new branded T-shirt'
-        },
-        {
-            _id: ObjectId("61a2d6b73020a42e0968c3eb"),
-            name: 'A Computer',
-            price: 1299.99,
-            description: 'A latest high quality gaming computer',
-            details: { cpu: 'Intel i7 8770', memory: 32 }
-        }
-    ]
-    ```
+  ```log
+  [
+      {
+          _id: ObjectId("61a2d3573020a42e0968c3e9"),
+          name: 'A Book',
+          price: 12.99
+      },
+      {
+          _id: ObjectId("61a2d6173020a42e0968c3ea"),
+          name: 'A T-shirt',
+          price: 29.99,
+          description: 'A new branded T-shirt'
+      },
+      {
+          _id: ObjectId("61a2d6b73020a42e0968c3eb"),
+          name: 'A Computer',
+          price: 1299.99,
+          description: 'A latest high quality gaming computer',
+          details: { cpu: 'Intel i7 8770', memory: 32 }
+      }
+  ]
+  ```
+
+- List all the collections present in the current database:  
+`> show collections`
+
+  ```log
+  flightData
+  ```
 
 ## A Big Picture of MongoDB Working with the Clients
 
@@ -179,10 +187,10 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
 
 - Insert one document in a collection:  
 `> use flights`  
-`> db.flightData.insertOne({ departureAirport: "MUC", arrivalAirport: "SFO", aircraft: "Airbus A380", distance: 12000, intercontinental: true })`
+`> db.flightData.insertOne({ departureAirport: "MUC", arrivalAirport: "SFO", aircraft: "Airbus A380", distance: 12000, intercontinental: true })`  
 `> db.flightData.insertOne({ departureAirport: "TXL", arrivalAirport: "LHR" })`
 
-  ```json
+  ```log
     {
         acknowledged: true,
         insertedId: ObjectId("61a402d6ee6d4171445ef746")
@@ -207,7 +215,7 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
 - Insert one document in a collection with a user defined custom unique id:  
 `> db.flightData.insertOne({ departureAirport: "TXL", arrivalAirport: "LHR", _id: "txl-lhr-1" })`
 
-  ```json
+  ```log
   { acknowledged: true, insertedId: 'txl-lhr-1' }
   ```
 
@@ -232,9 +240,9 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
   - find() returns all matching documents, findOne() returns the first match matching document.
 
 - Update:
-  - updateOne(filter, data, options)
-  - updateMany(filter, data, options)
-  - replaceOne(filter, data, options)
+  - `updateOne(filter, data, options)`
+  - `updateMany(filter, data, options)`
+  - `replaceOne(filter, data, options)`
 
   __Note__:
   - filter: Allows us to narrow down which documents to change / update.
@@ -242,33 +250,25 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
   - replaceOne() replaces the document entirely with a new one.
 
 - Delete:
-  - deleteOne(filter, options)
-  - deleteMany(filter, options)
+  - `deleteOne(filter, options)`
+  - `deleteMany(filter, options)`
 
 ### Demonstration of Create, Read, Update and Delete Operations
 
-- Delete a document from a collection.
+- Delete a document from a collection:  
 `> db.flightData.deleteOne({ departureAirport: "TXL" })`
 
-  ```json
+  ```log
   { acknowledged: true, deletedCount: 1 }
   ```
 
   __Note__:
   - We can also use the unique id to delete any document from a collection.
 
-- Update a document in a collection.
+- Update a document in a collection (adding a new field and value to those documents that we want to delete):  
+`> db.flightData.updateOne( { distance: 12000 }, { $set: { marker: "delete" } } )`
 
-  ```json
-  > db.flightData.updateOne(
-    { distance: 12000 },
-    {
-        $set: { marker: "delete" }
-    }
-  )
-  ```
-
-  ```json
+  ```log
   {
     acknowledged: true,
     insertedId: null,
@@ -278,5 +278,685 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
   }
   ```
 
+- Update all the documents in a collection (adding a new field and value to those documents that we want to delete):  
+`> db.flightData.updateMany( {}, { $set: { marker: "toDelete" } } )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 2,
+    modifiedCount: 2,
+    upsertedCount: 0
+  }
+  ```
+
+- Delete all the documents in a collection (deleting documents which has a field 'marker' set to 'toDelete'):  
+`> db.flightData.deleteMany({})`  
+`> db.flightData.deleteMany({ marker: "toDelete"})`
+
+  ```log
+  { acknowledged: true, deletedCount: 2 }
+  ```
+
   __Note__:
-  - TODO: 
+  - $set is an atomic operator, anything with dollar (\$) sign in mongodb is a reserved operator or word.
+  - $set is simply identified by mongodb when used in the updateOne() operation to describe the changes you want to make. The value of $set is then a document with curly braces and this tells mongodb to set this value. If the value did exist, it would change it to delete and if it does not exist it will add it.
+
+- Insert many documents in the collection:  
+`> db.flightData.insertMany([
+    {
+      "departureAirport": "MUC",
+      "arrivalAirport": "SFO",
+      "aircraft": "Airbus A380",
+      "distance": 12000,
+      "intercontinental": true
+    },
+    {
+      "departureAirport": "LHR",
+      "arrivalAirport": "TXL",
+      "aircraft": "Airbus A320",
+      "distance": 950,
+      "intercontinental": false
+    }
+  ])`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedIds: {
+      '0': ObjectId("61d185d9f0a50748aabee8cc"),
+      '1': ObjectId("61d185d9f0a50748aabee8cd")
+    }
+  }
+  ```
+
+  __Note__:
+
+  - insertMany() takes an array of json objects as an argument.
+
+- We can find some specific data by adding some filter conditions in the find() and findOne() command. For example, find all the flights where 'intercontinental' is set to 'true':  
+`> db.flightData.find({ intercontinental: true })`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cc"),
+      departureAirport: 'MUC',
+      arrivalAirport: 'SFO',
+      aircraft: 'Airbus A380',
+      distance: 12000,
+      intercontinental: true
+    }
+  ]
+  ```
+
+- Find all the flights which covers a distance greater than 900:  
+`> db.flightData.find({ distance: { $gt: 900 } })`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cc"),
+      departureAirport: 'MUC',
+      arrivalAirport: 'SFO',
+      aircraft: 'Airbus A380',
+      distance: 12000,
+      intercontinental: true
+    },
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cd"),
+      departureAirport: 'LHR',
+      arrivalAirport: 'TXL',
+      aircraft: 'Airbus A320',
+      distance: 950,
+      intercontinental: false
+    }
+  ]
+  ```
+
+- Find the first matching flight which covers a distance greater than 900:  
+`> db.flightData.findOne({ distance: { $gt: 900 } })`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cc"),
+      departureAirport: 'MUC',
+      arrivalAirport: 'SFO',
+      aircraft: 'Airbus A380',
+      distance: 12000,
+      intercontinental: true
+    }
+  ]
+  ```
+
+### update(), updateOne(), updateMany(), replaceOne()
+
+- updateOne() will use the filter and change a single matching document with the given value.
+- Update the flight having _id: ObjectId("61d185d9f0a50748aabee8cc") and set value delayed to true:  
+`> db.flightData.updateOne( { _id: ObjectId("61d185d9f0a50748aabee8cc") }, { $set: { delayed: true } } )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0
+  }
+  ```
+
+- update() and updateMany() both works the same way. updateMany() was used to update all matching elements and update would also update all matching elements.
+- Update the flight having _id: ObjectId("61d185d9f0a50748aabee8cc") and set value delayed to false:  
+`> db.flightData.update( { _id: ObjectId("61d185d9f0a50748aabee8cc") }, { $set: { delayed: false } } )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0
+  }
+  ```
+
+- replaceOne() replaces a single document within the collection based on the filter.
+- replaceOne() works without using any atomic operator.  
+`> db.flightData.replaceOne( { _id: ObjectId("61d185d9f0a50748aabee8cc") }, { delayed: false } )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0
+  }
+  ```
+
+  `> db.flightData.find()`
+
+  ```log
+  [
+    { _id: ObjectId("61d185d9f0a50748aabee8cc"), delayed: false },
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cd"),
+      departureAirport: 'LHR',
+      arrivalAirport: 'TXL',
+      aircraft: 'Airbus A320',
+      distance: 950,
+      intercontinental: false
+    }
+  ]
+  ```
+
+  `> db.flightData.replaceOne( { _id: ObjectId("61d185d9f0a50748aabee8cc") }, { "departureAirport": "MUC", "arrivalAirport": "SFO", "aircraft": "Airbus A380", "distance": 12000, "intercontinental": true } )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0
+  }
+  ```
+
+### Understanding find() and the cursor object
+
+- Insert a list of documents into passengers collection.  
+`> db.passengers.insertMany([
+  {
+    "name": "Max Schwarzmueller",
+    "age": 29
+  },
+  {
+    "name": "Manu Lorenz",
+    "age": 30
+  },
+  {
+    "name": "Chris Hayton",
+    "age": 35
+  },
+  {
+    "name": "Sandeep Kumar",
+    "age": 28
+  },
+  {
+    "name": "Maria Jones",
+    "age": 30
+  },
+  {
+    "name": "Alexandra Maier",
+    "age": 27
+  },
+  {
+    "name": "Dr. Phil Evans",
+    "age": 47
+  },
+  {
+    "name": "Sandra Brugge",
+    "age": 33
+  },
+  {
+    "name": "Elisabeth Mayr",
+    "age": 29
+  },
+  {
+    "name": "Frank Cube",
+    "age": 41
+  },
+  {
+    "name": "Karandeep Alun",
+    "age": 48
+  },
+  {
+    "name": "Michaela Drayer",
+    "age": 39
+  },
+  {
+    "name": "Bernd Hoftstadt",
+    "age": 22
+  },
+  {
+    "name": "Scott Tolib",
+    "age": 44
+  },
+  {
+    "name": "Freddy Melver",
+    "age": 41
+  },
+  {
+    "name": "Alexis Bohed",
+    "age": 35
+  },
+  {
+    "name": "Melanie Palace",
+    "age": 27
+  },
+  {
+    "name": "Armin Glutch",
+    "age": 35
+  },
+  {
+    "name": "Klaus Arber",
+    "age": 53
+  },
+  {
+    "name": "Albert Twostone",
+    "age": 68
+  },
+  {
+    "name": "Gordon Black",
+    "age": 38
+  }
+])`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedIds: {
+      '0': ObjectId("61e862209c0d68e14668517b"),
+      '1': ObjectId("61e862209c0d68e14668517c"),
+      '2': ObjectId("61e862209c0d68e14668517d"),
+      '3': ObjectId("61e862209c0d68e14668517e"),
+      '4': ObjectId("61e862209c0d68e14668517f"),
+      '5': ObjectId("61e862209c0d68e146685180"),
+      '6': ObjectId("61e862209c0d68e146685181"),
+      '7': ObjectId("61e862209c0d68e146685182"),
+      '8': ObjectId("61e862209c0d68e146685183"),
+      '9': ObjectId("61e862209c0d68e146685184"),
+      '10': ObjectId("61e862209c0d68e146685185"),
+      '11': ObjectId("61e862209c0d68e146685186"),
+      '12': ObjectId("61e862209c0d68e146685187"),
+      '13': ObjectId("61e862209c0d68e146685188"),
+      '14': ObjectId("61e862209c0d68e146685189"),
+      '15': ObjectId("61e862209c0d68e14668518a"),
+      '16': ObjectId("61e862209c0d68e14668518b"),
+      '17': ObjectId("61e862209c0d68e14668518c"),
+      '18': ObjectId("61e862209c0d68e14668518d"),
+      '19': ObjectId("61e862209c0d68e14668518e"),
+      '20': ObjectId("61e862209c0d68e14668518f")
+    }
+  }
+  ```
+
+- find() gives us back a cursor and not an array of all the documents in a collection, because the collection could be very big. Even though it looked liked it gave us all the data but it actually gives us a so called cursor object, an object which has a lot of metadata behind it. This cursor object helps us cycle through the results.
+- MongoDB shell fetches the first 20 documents from the cursor and stops right after that.
+- `it` command is used to fetch of next bunch of data from the cursor.  
+`> db.passengers.find()`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668517b"),
+      name: 'Max Schwarzmueller',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517c"),
+      name: 'Manu Lorenz',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517d"),
+      name: 'Chris Hayton',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517e"),
+      name: 'Sandeep Kumar',
+      age: 28
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517f"),
+      name: 'Maria Jones',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685180"),
+      name: 'Alexandra Maier',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685181"),
+      name: 'Dr. Phil Evans',
+      age: 47
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685182"),
+      name: 'Sandra Brugge',
+      age: 33
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685183"),
+      name: 'Elisabeth Mayr',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685184"),
+      name: 'Frank Cube',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685185"),
+      name: 'Karandeep Alun',
+      age: 48
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685186"),
+      name: 'Michaela Drayer',
+      age: 39
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685187"),
+      name: 'Bernd Hoftstadt',
+      age: 22
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685188"),
+      name: 'Scott Tolib',
+      age: 44
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685189"),
+      name: 'Freddy Melver',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518a"),
+      name: 'Alexis Bohed',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518b"),
+      name: 'Melanie Palace',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518c"),
+      name: 'Armin Glutch',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518d"),
+      name: 'Klaus Arber',
+      age: 53
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518e"),
+      name: 'Albert Twostone',
+      age: 68
+    }
+  ]
+  Type "it" for more
+  flights> it
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668518f"),
+      name: 'Gordon Black',
+      age: 38
+    }
+  ]
+  ```
+
+- toArray() method can be used to exhaust the cursor by fetching all the documents at a shot.  
+`> db.passengers.find().toArray()`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668517b"),
+      name: 'Max Schwarzmueller',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517c"),
+      name: 'Manu Lorenz',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517d"),
+      name: 'Chris Hayton',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517e"),
+      name: 'Sandeep Kumar',
+      age: 28
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517f"),
+      name: 'Maria Jones',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685180"),
+      name: 'Alexandra Maier',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685181"),
+      name: 'Dr. Phil Evans',
+      age: 47
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685182"),
+      name: 'Sandra Brugge',
+      age: 33
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685183"),
+      name: 'Elisabeth Mayr',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685184"),
+      name: 'Frank Cube',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685185"),
+      name: 'Karandeep Alun',
+      age: 48
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685186"),
+      name: 'Michaela Drayer',
+      age: 39
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685187"),
+      name: 'Bernd Hoftstadt',
+      age: 22
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685188"),
+      name: 'Scott Tolib',
+      age: 44
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685189"),
+      name: 'Freddy Melver',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518a"),
+      name: 'Alexis Bohed',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518b"),
+      name: 'Melanie Palace',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518c"),
+      name: 'Armin Glutch',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518d"),
+      name: 'Klaus Arber',
+      age: 53
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518e"),
+      name: 'Albert Twostone',
+      age: 68
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518f"),
+      name: 'Gordon Black',
+      age: 38
+    }
+  ]
+  ```
+
+- We can use forEach() method and write some code which will be applicable for each document present on the collection. Following is another way of fetching all the documents from a collection. This piece of code fetches on document at a time and prints it on the console.  
+`> db.passengers.find().forEach( (passengerData) => { printjson(passengerData) } )`
+
+  ```log
+  {
+    _id: ObjectId("61e862209c0d68e14668517b"),
+    name: 'Max Schwarzmueller',
+    age: 29
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668517c"),
+    name: 'Manu Lorenz',
+    age: 30
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668517d"),
+    name: 'Chris Hayton',
+    age: 35
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668517e"),
+    name: 'Sandeep Kumar',
+    age: 28
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668517f"),
+    name: 'Maria Jones',
+    age: 30
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685180"),
+    name: 'Alexandra Maier',
+    age: 27
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685181"),
+    name: 'Dr. Phil Evans',
+    age: 47
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685182"),
+    name: 'Sandra Brugge',
+    age: 33
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685183"),
+    name: 'Elisabeth Mayr',
+    age: 29
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685184"),
+    name: 'Frank Cube',
+    age: 41
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685185"),
+    name: 'Karandeep Alun',
+    age: 48
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685186"),
+    name: 'Michaela Drayer',
+    age: 39
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685187"),
+    name: 'Bernd Hoftstadt',
+    age: 22
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685188"),
+    name: 'Scott Tolib',
+    age: 44
+  }
+  {
+    _id: ObjectId("61e862209c0d68e146685189"),
+    name: 'Freddy Melver',
+    age: 41
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518a"),
+    name: 'Alexis Bohed',
+    age: 35
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518b"),
+    name: 'Melanie Palace',
+    age: 27
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518c"),
+    name: 'Armin Glutch',
+    age: 35
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518d"),
+    name: 'Klaus Arber',
+    age: 53
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518e"),
+    name: 'Albert Twostone',
+    age: 68
+  }
+  {
+    _id: ObjectId("61e862209c0d68e14668518f"),
+    name: 'Gordon Black',
+    age: 38
+  }
+  ```
+
+- The following code fetches one document at time and print the name and the age of each passenger.  
+`> db.passengers.find().forEach( (passengerData) => { printjson(passengerData.name + ' ' + passengerData.age) } )`
+
+  ```log
+  Max Schwarzmueller 29
+  Manu Lorenz 30
+  Chris Hayton 35
+  Sandeep Kumar 28
+  Maria Jones 30
+  Alexandra Maier 27
+  Dr. Phil Evans 47
+  Sandra Brugge 33
+  Elisabeth Mayr 29
+  Frank Cube 41
+  Karandeep Alun 48
+  Michaela Drayer 39
+  Bernd Hoftstadt 22
+  Scott Tolib 44
+  Freddy Melver 41
+  Alexis Bohed 35
+  Melanie Palace 27
+  Armin Glutch 35
+  Klaus Arber 53
+  Albert Twostone 68
+  Gordon Black 38
+  ```
+
+  __NOTE__:
+  - find() gives us back a cursor that is the reason why we can additionally use pretty() method at the end of it. Whereas findOne() gives us back a document hence appending it with pretty() throws us an error (i.e. pretty() method works only on a curor object).  
+  `> db.passengers.findOne().pretty()`
+
+    ```log
+    TypeError: db.passengers.findOne().pretty is not a function
+    ```
+
