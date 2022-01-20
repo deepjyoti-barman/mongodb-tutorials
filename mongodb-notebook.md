@@ -960,3 +960,356 @@ __Note__: We always talk to the MongoDB server and behind that server, the serve
     TypeError: db.passengers.findOne().pretty is not a function
     ```
 
+### Projection
+
+- Projection is fetching out only the useful information (key-value pairs) of all the documents present in a collection over the wire from the MongoDB server. Ofcouse we can fetch all the data and filter it in our application or in any programming language we can manipulate the data we are getting back but still we would transfer it over wire - which would impact our bandwidth by fetching unnecessary data. So it would be better to filter this out on the MongoDB server itself, and this can be done with the help of Projection.
+- Projection can be done easily by passing a second argument to find() method. We have to pass another document (i.e. a pair of curly braces) and specify the key value pairs that we are interested in. So, enter the name the field you want to get (within the curly braces) and set it to 1 as its value, which means include it in the data MongoDB is returning to us.  
+`> db.passengers.find( {}, { name: 1 } )`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668517b"),
+      name: 'Max Schwarzmueller'
+    },
+    { _id: ObjectId("61e862209c0d68e14668517c"), name: 'Manu Lorenz' },
+    { _id: ObjectId("61e862209c0d68e14668517d"), name: 'Chris Hayton' },
+    { _id: ObjectId("61e862209c0d68e14668517e"), name: 'Sandeep Kumar' },
+    { _id: ObjectId("61e862209c0d68e14668517f"), name: 'Maria Jones' },
+    {
+      _id: ObjectId("61e862209c0d68e146685180"),
+      name: 'Alexandra Maier'
+    },
+    { _id: ObjectId("61e862209c0d68e146685181"), name: 'Dr. Phil Evans' },
+    { _id: ObjectId("61e862209c0d68e146685182"), name: 'Sandra Brugge' },
+    { _id: ObjectId("61e862209c0d68e146685183"), name: 'Elisabeth Mayr' },
+    { _id: ObjectId("61e862209c0d68e146685184"), name: 'Frank Cube' },
+    { _id: ObjectId("61e862209c0d68e146685185"), name: 'Karandeep Alun' },
+    {
+      _id: ObjectId("61e862209c0d68e146685186"),
+      name: 'Michaela Drayer'
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685187"),
+      name: 'Bernd Hoftstadt'
+    },
+    { _id: ObjectId("61e862209c0d68e146685188"), name: 'Scott Tolib' },
+    { _id: ObjectId("61e862209c0d68e146685189"), name: 'Freddy Melver' },
+    { _id: ObjectId("61e862209c0d68e14668518a"), name: 'Alexis Bohed' },
+    { _id: ObjectId("61e862209c0d68e14668518b"), name: 'Melanie Palace' },
+    { _id: ObjectId("61e862209c0d68e14668518c"), name: 'Armin Glutch' },
+    { _id: ObjectId("61e862209c0d68e14668518d"), name: 'Klaus Arber' },
+    {
+      _id: ObjectId("61e862209c0d68e14668518e"),
+      name: 'Albert Twostone'
+    }
+  ]
+  Type "it" for more
+  flights> it
+  [ { _id: ObjectId("61e862209c0d68e14668518f"), name: 'Gordon Black' } ]
+  ```
+
+- The _id of the documents is a special field which is always included by default. We have to explicitly exclude it if you don't want to add it. We can exclude something by specifying the name of the field (inside the curly braces) and set its value to 0 instead of 1.  
+`> db.passengers.find( {}, { name: 1, _id: 0} )`
+
+  ```log
+  [
+    { name: 'Max Schwarzmueller' },
+    { name: 'Manu Lorenz' },
+    { name: 'Chris Hayton' },
+    { name: 'Sandeep Kumar' },
+    { name: 'Maria Jones' },
+    { name: 'Alexandra Maier' },
+    { name: 'Dr. Phil Evans' },
+    { name: 'Sandra Brugge' },
+    { name: 'Elisabeth Mayr' },
+    { name: 'Frank Cube' },
+    { name: 'Karandeep Alun' },
+    { name: 'Michaela Drayer' },
+    { name: 'Bernd Hoftstadt' },
+    { name: 'Scott Tolib' },
+    { name: 'Freddy Melver' },
+    { name: 'Alexis Bohed' },
+    { name: 'Melanie Palace' },
+    { name: 'Armin Glutch' },
+    { name: 'Klaus Arber' },
+    { name: 'Albert Twostone' }
+  ]
+  Type "it" for more
+  flights> it
+  [ { name: 'Gordon Black' } ]
+  ```
+
+- The important thing to remember from projection is that the filtering happens before the data is shipped to us over the wire and no real manipulation took place in the database - as a result we don't get unnecessary data and there we don't impact our bandwidth.
+
+### Embedded Documents
+
+- Embedded or nested documents is a core feature of MongoDB.
+- Embedded documents simply means that we can have a field in our document like name, age etc but then this could be another document - that is the value of the field could be another document.
+- We can have multiple such documents and these documents can have other sub-documents which then can have other sub-documents. So, we can nest your documents all in one overarching document in one collection.
+- MongoDB allows us upto 100 level of nesting, but we rarely need more than 3 or 4 levels and we also got another hard limit that is - the overall document size has to be below 16 Megabytes.
+- Another kind of data we can store are arrays. Arrays can store any type of data - list of data, even documents.  
+`> db.flightData.updateMany(
+  {},
+  {
+    $set: {
+      status: {
+        description: 'On-time',
+        lastUpdated: '1 hour ago',
+        details: {
+          responsible: 'Maximillian Schwarzmueller'
+        }
+      }
+    }
+  }
+)`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 2,
+    modifiedCount: 2,
+    upsertedCount: 0
+  }
+  ```
+
+  `> db.flightData.find()`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cc"),
+      departureAirport: 'MUC',
+      arrivalAirport: 'SFO',
+      aircraft: 'Airbus A380',
+      distance: 12000,
+      intercontinental: true,
+      status: {
+        description: 'On-time',
+        lastUpdated: '1 hour ago',
+        details: { responsible: 'Maximillian Schwarzmueller' }
+      }
+    },
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cd"),
+      departureAirport: 'LHR',
+      arrivalAirport: 'TXL',
+      aircraft: 'Airbus A320',
+      distance: 950,
+      intercontinental: false,
+      status: {
+        description: 'On-time',
+        lastUpdated: '1 hour ago',
+        details: { responsible: 'Maximillian Schwarzmueller' }
+      }
+    }
+  ]
+  ```
+
+  `> db.passengers.updateOne(
+    { name: 'Albert Twostone' },
+    {
+      $set: {
+        hobbies: ['Sports', 'Cooking']
+      }
+    }
+  )`
+
+  ```log
+  {
+    acknowledged: true,
+    insertedId: null,
+    matchedCount: 1,
+    modifiedCount: 1,
+    upsertedCount: 0
+  }
+  ```
+
+  `> db.passengers.find()`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668517b"),
+      name: 'Max Schwarzmueller',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517c"),
+      name: 'Manu Lorenz',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517d"),
+      name: 'Chris Hayton',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517e"),
+      name: 'Sandeep Kumar',
+      age: 28
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668517f"),
+      name: 'Maria Jones',
+      age: 30
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685180"),
+      name: 'Alexandra Maier',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685181"),
+      name: 'Dr. Phil Evans',
+      age: 47
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685182"),
+      name: 'Sandra Brugge',
+      age: 33
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685183"),
+      name: 'Elisabeth Mayr',
+      age: 29
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685184"),
+      name: 'Frank Cube',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685185"),
+      name: 'Karandeep Alun',
+      age: 48
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685186"),
+      name: 'Michaela Drayer',
+      age: 39
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685187"),
+      name: 'Bernd Hoftstadt',
+      age: 22
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685188"),
+      name: 'Scott Tolib',
+      age: 44
+    },
+    {
+      _id: ObjectId("61e862209c0d68e146685189"),
+      name: 'Freddy Melver',
+      age: 41
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518a"),
+      name: 'Alexis Bohed',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518b"),
+      name: 'Melanie Palace',
+      age: 27
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518c"),
+      name: 'Armin Glutch',
+      age: 35
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518d"),
+      name: 'Klaus Arber',
+      age: 53
+    },
+    {
+      _id: ObjectId("61e862209c0d68e14668518e"),
+      name: 'Albert Twostone',
+      age: 68,
+      hobbies: [ 'Sports', 'Cooking' ]
+    }
+  ]
+  Type "it" for more
+  ```
+
+### Accessing Structured Data
+
+- Find the hobbies of 'Albert Twostone'. find() method would fail to fetch any result in this case because MongoDB can't fetch a field's value for all the documents.  
+`> db.passengers.find( { name: 'Albert Twostone' } ).hobbies`
+
+  ```log
+
+  ```
+
+  `> db.passengers.findOne( { name: 'Albert Twostone' } ).hobbies`
+
+  ```log
+  [ 'Sports', 'Cooking' ]
+  ```
+
+- Find all the passengers having a hobby of sports.  
+`> db.passengers.find( { hobbies: 'Sports' } )`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61e862209c0d68e14668518e"),
+      name: 'Albert Twostone',
+      age: 68,
+      hobbies: [ 'Sports', 'Cooking' ]
+    }
+  ]
+  ```
+
+- Find all the flights where the responsible person is 'Maximillian Schwarzmueller'
+- While accessing nested properties single quotes around the key becomes necessary or we will get an error.  
+`> db.flightData.find( { status.details.responsible: 'Maximillian Schwarzmueller' } )`
+
+  ```log
+  Uncaught:
+  SyntaxError: Unexpected token, expected "," (1:28)
+
+  > 1 | db.flightData.find( { status.details.responsible: 'Maximillian Schwarzmueller' } )
+      |                             ^
+    2 |
+  ```
+
+  `> db.flightData.find( { 'status.details.responsible': 'Maximillian Schwarzmueller' } )`
+
+  ```log
+  [
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cc"),
+      departureAirport: 'MUC',
+      arrivalAirport: 'SFO',
+      aircraft: 'Airbus A380',
+      distance: 12000,
+      intercontinental: true,
+      status: {
+        description: 'On-time',
+        lastUpdated: '1 hour ago',
+        details: { responsible: 'Maximillian Schwarzmueller' }
+      }
+    },
+    {
+      _id: ObjectId("61d185d9f0a50748aabee8cd"),
+      departureAirport: 'LHR',
+      arrivalAirport: 'TXL',
+      aircraft: 'Airbus A320',
+      distance: 950,
+      intercontinental: false,
+      status: {
+        description: 'On-time',
+        lastUpdated: '1 hour ago',
+        details: { responsible: 'Maximillian Schwarzmueller' }
+      }
+    }
+  ]
+  ```
+
+### Module Summary
+
+![Summary of Basics & CRUD Operations](Diagrams/summary-basics-and-crud-operations.png)
